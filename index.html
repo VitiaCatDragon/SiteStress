@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Site Stress</title>
+    <script src="main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+</head>
+<body>
+<form>
+    <input type="url" placeholder="Enter url..." id="url">
+    <input type="number" placeholder="Number of requests" id="requestsCount">
+    <button type="button" onclick="check()">Check</button>
+    <button type="button" id="language" onclick="changeLanguage()">English</button>
+</form>
+<canvas id="statusChart" class="chart"></canvas>
+<canvas id="responseTimeChart" class="chart"></canvas>
+</body>
+</html>
