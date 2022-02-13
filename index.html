@@ -9,10 +9,27 @@
 </head>
 <body>
 <form>
+    <select id="requestMethod">
+        <option value="get" selected>GET</option>
+        <option value="post">POST</option>
+    </select>
     <input type="url" placeholder="Enter url..." id="url">
     <input type="number" placeholder="Number of requests" id="requestsCount">
     <button type="button" onclick="check()">Check</button>
     <button type="button" id="language" onclick="changeLanguage()">English</button>
+</form>
+<form style="margin-top: 25px">
+    <select id="bodyType">
+        <option value="json" selected>Text / JSON</option>
+        <option value="formData">Form Data (Params)</option>
+    </select><br>
+    <textarea style="margin-top: 10px" id="textBody" rows="8" cols="50" placeholder="{}"></textarea>
+    <div style="margin-top: 10px" id="formData">
+        <button type="button" id="add">+</button>
+        <button type="button" id="remove">-</button>
+        <div id="pairs">
+        </div>
+    </div>
 </form>
 <canvas id="statusChart" class="chart"></canvas>
 <canvas id="responseTimeChart" class="chart"></canvas>

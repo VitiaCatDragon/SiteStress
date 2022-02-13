@@ -2,6 +2,8 @@ let statusChart = null
 let responseTimeChart = null
 let i = 0
 
+let formData = []
+
 const lang = {
     ru: {
         statusCodes: "Коды состояния",
@@ -33,27 +35,49 @@ async function check() {
     responseTimeChart?.destroy()
     let requests_count = parseInt(document.getElementById('requestsCount').value)
     let url = document.getElementById('url').value
+    let method = document.getElementById('requestMethod').value
+    let body = document.getElementById('textBody').value
+    let bodyType = document.getElementById('bodyType').value
+    let data = new FormData()
+
     let completed_requests = 0
     let colors = []
     let requestsCodes = {}
     let requestsTimes = {}
+    let error = false
+
+    if(bodyType === 'formData' && formData.length > 0){
+        for (let j = 0; j < formData.length; j++) {
+            data.append(document.getElementById('key' + j).value ,document.getElementById('value' + j).value)
+        }
+    }
 
     for (let i = 0; i < requests_count; i++) {
+        if(error)
+            break
         let now = Date.now()
-        const result = await fetch(url).then(a => {
+        const result = await fetch(url, {
+            method: method,
+            body: method === 'post' ? bodyType === 'formData' ? data : body : null
+        }).then(a => {
             if (requestsCodes[a.status] === undefined)
                 requestsCodes[a.status.toString()] = 1
             else
                 requestsCodes[a.status.toString()] += 1
             requestsTimes[i] = Date.now() - now
             completed_requests++
-        }).catch(a => console.error(a))
+        }).catch(a => {
+            console.error('Error: ' + a)
+            if (a instanceof TypeError){
+                alert('TypeError: ' + a.message + ' | Maybe CORS blocking website?')
+                error = true
+            }
+        })
     }
 
     i = setInterval(() => {
         if(completed_requests !== requests_count)
             return
-        console.log(requestsTimes)
         const ctx = document.getElementById('statusChart').getContext('2d');
         const ctx2 = document.getElementById('responseTimeChart').getContext('2d');
         let count = []
@@ -134,4 +158,26 @@ function statusCodeColor(code){
 window.onload = () => {
     currentLang = Cookies.get('lang') == null ? 'ru' : Cookies.get('lang')
     document.getElementById('language').textContent = lang[currentLang].name
+    document.getElementById('add').addEventListener('click', () => {
+        for (let j = 0; j < formData.length; j++) {
+            formData[j].key = document.getElementById('key' + j).value
+            formData[j].value = document.getElementById('value' + j).value
+        }
+        document.getElementById('pairs').innerHTML += `<div style="margin-bottom: 5px" id="data${formData.length}">
+            <input type="text" placeholder="key" id="key${formData.length}">
+            <input type="text" placeholder="value" id="value${formData.length}">
+        </div>`
+        formData.push({key: '', value: ''})
+        for (let j = 0; j < formData.length; j++) {
+            document.getElementById('key' + j).value = formData[j].key
+            document.getElementById('value' + j).value = formData[j].value
+        }
+    })
+
+    document.getElementById('remove').addEventListener("click", () =>{
+        if(formData.length > 0){
+            document.getElementById('data' + (formData.length - 1)).remove()
+            formData.pop()
+        }
+    })
 }
